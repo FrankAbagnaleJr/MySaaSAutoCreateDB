@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    # 严格匹配模式，匹配不到数据源就报错
+    dynamic:
+      strict: true
+      datasource:
+        master:
+          url: jdbc:mysql://192.168.101.65:3306/itcast?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+          username: root
+          password: mysql
+          type: com.alibaba.druid.pool.DruidDataSource
+          init-size: 5
+          min-idle: 5
+          max-active: 20
+          max-wait: 60000
+          time-between-eviction-runs-millis: 60000
+          min-evictable-idle-time-millis: 300000
+          validation-quary: SELECT 1 FROM DUAL
+          test-while-idle: true
+          test-on-borrow: false
+          test-on-return: false
+          pool-prepared-statements: true
+          max-pool-prepared-statement-per-connection-size: 20
+          web-stat.enabled: true
+          web-stat.session-stat-enable: true
+          web-stat.session-stat-max-count: 1000
+          web-stat.profile-enable: true
+          web-stat.url-patternbs: /*
+          web-stat.exclusions: /*.js,/*.gif,/*.jpg,/*.png,/*.css,/*.ico,/druid/*
+          stat-view-servlet.enabled: true
+          stat-view-servlet.url-mappings: /durid/*
+          stat-view-servlet.reset-enable: false
+          stat-view-servlet.login-username: admin
+          stat-view-servlet.login-password: admin
+
+logging:
+  level:
+    com.kyrie.mapper: debug
+
+mybatis-plus:
+  # mybatis的实体类路径
+  type-aliases-package: com.kyrie.pojo
+  # mapper.xml的路径
+  mapper-locations: classpath:mapper/*.xml
+  # 这里是放了一个mysql分页配置，没有用mybatis的分页插件，pagehelper-spring-boot-starter依赖的分页插件
+  config-location: classpath:mysql-config.xml
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  page-size-zero: tre
+  params: countSql
