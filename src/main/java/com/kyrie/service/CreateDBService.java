@@ -7,4 +7,6 @@ import java.sql.SQLException;
 
 public interface CreateDBService {
     String initDB(CreateDbDTO createDBDTO) throws ClassNotFoundException, SQLException, IOException;
+
+    String addDataSource(CreateDbDTO createDbDTO);
 }

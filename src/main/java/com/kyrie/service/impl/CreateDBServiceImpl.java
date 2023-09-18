@@ -1,5 +1,7 @@
 package com.kyrie.service.impl;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.kyrie.pojo.CreateDbDTO;
 import com.kyrie.service.CreateDBService;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +9,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +22,8 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class CreateDBServiceImpl implements CreateDBService {
+
+    DynamicRoutingDataSource dataSource = new DynamicRoutingDataSource();
     @Override
     public String initDB(CreateDbDTO createDBDTO) throws ClassNotFoundException, SQLException, IOException {
 
@@ -62,6 +67,7 @@ public class CreateDBServiceImpl implements CreateDBService {
             ScriptRunner scriptRunner = new ScriptRunner(connection);
             scriptRunner.setStopOnError(true);
 
+            //fixme 测试能不能放在包下
             ClassPathResource classPathResource = new ClassPathResource("db_wimoorTemplate.sql");
             InputStream inputStream = classPathResource.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -80,21 +86,32 @@ public class CreateDBServiceImpl implements CreateDBService {
         }
     }
 
+    @Override
+    public String addDataSource(CreateDbDTO createDbDTO) {
+        DruidDataSource tempDB = new DruidDataSource();
+        tempDB.setUrl(createDbDTO.getDbUrl());
+        tempDB.setUsername(createDbDTO.getDbUsername());
+        tempDB.setPassword(createDbDTO.getDbPassword());
+        tempDB.setDriverClassName(createDbDTO.getDriverClass());
+        dataSource.addDataSource(createDbDTO.getDbUsername(), tempDB);
+        return "用户："+ createDbDTO.getDbUsername() +", 数据源已添加：" + createDbDTO.getDbUrl();
+    }
+
     boolean tryConnectDB(CreateDbDTO createDBDTO) {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(createDBDTO.getDbUrl(), createDBDTO.getDbUsername(), createDBDTO.getDbPassword());
             return true;
         } catch (SQLException e) {
-            log.error("连接数据库失败",e.getMessage());
+            log.error("连接数据库失败", e.getMessage());
             return false;
-        }finally {
+        } finally {
             if (null != connection) {
                 try {
                     connection.commit();
                     connection.close();
                 } catch (SQLException e) {
-                    log.error("数据库连接关闭失败",e.getMessage());
+                    log.error("数据库连接关闭失败", e.getMessage());
                 }
             }
         }

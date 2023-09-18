@@ -1,18 +1,15 @@
-server:
-  port: 8081
-
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
     dynamic:
       # 严格匹配模式，匹配不到数据源就报错,默认false，（true未匹配到指定数据源时抛异常，false未匹配到数据源使用默认主数据源）
+      strict: true
       primary: master #这里写什么，下面的主数据源就写什么
-      strict: false
       datasource:
         master:
           url: jdbc:mysql://192.168.101.65:3306/itcast?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
           username: root
           password: mysql
+          type: com.alibaba.druid.pool.DruidDataSource
           init-size: 5
           min-idle: 5
           max-active: 20
@@ -41,19 +38,11 @@ spring:
           driver-class-name: com.mysql.cj.jdbc.Driver
           username: root
           password: mysql
-          initial-size: 1
-          min-idle: 1
-          max-active: 20
-          test-on-borrow: true
         slave_2:
           url: jdbc:mysql://192.168.101.653306/mybatis_plus_2?characterEncoding=utf-8&useSSL=false
           driver-class-name: com.mysql.cj.jdbc.Driver
           username: root
           password: mysql
-          initial-size: 1
-          min-idle: 1
-          max-active: 20
-          test-on-borrow: true
 
 logging:
   level:

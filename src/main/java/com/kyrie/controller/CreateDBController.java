@@ -19,4 +19,9 @@ public class CreateDBController {
     public String initDB(@RequestBody CreateDbDTO createDBDTO) throws SQLException, IOException, ClassNotFoundException {
         return createDBService.initDB(createDBDTO);
     }
+
+    @PostMapping("/addDataSource")
+    public String addDataSource(@RequestBody CreateDbDTO createDbDTO) {
+       return createDBService.addDataSource(createDbDTO);
+    }
 }
