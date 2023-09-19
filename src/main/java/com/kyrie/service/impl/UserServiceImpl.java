@@ -1,6 +1,5 @@
 package com.kyrie.service.impl;
 
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kyrie.mapper.UserMapper;
 import com.kyrie.pojo.User;

@@ -2,7 +2,6 @@ package com.kyrie.service.impl;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.kyrie.pojo.CreateDbDTO;
 import com.kyrie.service.CreateDBService;
 import lombok.extern.slf4j.Slf4j;

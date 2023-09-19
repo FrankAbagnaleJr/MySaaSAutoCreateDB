@@ -1,5 +1,6 @@
 package com.kyrie.controller;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.kyrie.pojo.CreateDbDTO;
 import com.kyrie.service.CreateDBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/create")
+@DS("master")
 public class CreateDBController {
 
     @Autowired
