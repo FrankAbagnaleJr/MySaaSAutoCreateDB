@@ -6,13 +6,19 @@ SaaS架构自动创建数据库操作，视频地址：https://www.bilibili.com/
 
 crud执行的操作都来自请求头中的数据源。
 
+（一）先自动建库<br>
+    Post请求路径 Localhost:8080/create/initDB  携带表单参数 schemaName、ip、port、username、password
+
     1. 自动执行数据库初始化脚本 (有测试方法)
         Controller中的initDB方法就是初始化数据库，根据前端传入的数据库地址、数据库名字等等建库
 
     2. 根据用户名登录，进行动态数据库切换，（配置多数据源）
         Controller中的addDataSource方法就是动态添加数据源，根据客户写的数据源添加
         
-
+（二）测试查询<br>
+    Post请求路径 Localhost:8080/test/add  携带表单参数 name、company、addr、phone。查看新创建的test_saas库有没有添加成功<br>
+    Get请求 Localhost:8080/test/find/1   查看是否能查到刚才添加的数据
+    
 
 ---------------------------------------------------------------------------------
 实战：

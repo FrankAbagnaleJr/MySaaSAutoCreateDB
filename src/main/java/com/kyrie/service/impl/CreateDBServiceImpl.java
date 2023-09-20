@@ -3,14 +3,15 @@ package com.kyrie.service.impl;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.kyrie.pojo.CreateDbDTO;
+import com.kyrie.mapper.CreateDBMapper;
+import com.kyrie.pojo.CreateDbInfo;
 import com.kyrie.service.CreateDBService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -26,6 +27,12 @@ import java.util.Objects;
 @DS("master")
 public class CreateDBServiceImpl implements CreateDBService {
 
+    @Autowired
+    CreateDBService createDBServiceProxy;
+
+    @Autowired
+    CreateDBMapper createDBMapper;
+
     @Resource
     DynamicRoutingDataSource dataSource;
 
@@ -33,16 +40,17 @@ public class CreateDBServiceImpl implements CreateDBService {
     HttpServletResponse response;
 
     @Override
-    public String initDB(CreateDbDTO createDBDTO){
+    @Transactional
+    public String initDB(CreateDbInfo createDbInfo){
 
         //TODO 建库之前先检查数据库是否能连接成功
-        boolean flag = tryConnectDB(createDBDTO);
+        boolean flag = tryConnectDB(createDbInfo);
         if (!flag) {
             return "数据库连接失败！请检查连接信息，或者联系我们工作人员。";
         }
 
         //TODO 建库之前先从数据库表查询是否重名 和是否已经创建
-        boolean falg2 = checkDBName(createDBDTO);
+        boolean falg2 = checkDBName(createDbInfo);
         if (!falg2) {
             return "数据库已存在！";
         }
@@ -50,11 +58,11 @@ public class CreateDBServiceImpl implements CreateDBService {
         Connection connection = null;
 
         try {
-            String schema = createDBDTO.getSchemaName();
-            String jdbcurl = createDBDTO.getUrl();
-            String username = createDBDTO.getUsername();
-            String password = createDBDTO.getPassword();
-            String driverClass = createDBDTO.getDriverClass();
+            String schema = createDbInfo.getSchemaName();
+            String jdbcurl = createDbInfo.getUrl();
+            String username = createDbInfo.getUsername();
+            String password = createDbInfo.getPassword();
+            String driverClass = createDbInfo.getDriverClass();
 
             //建库语句
             String sqlCreateSchema = "CREATE DATABASE IF NOT EXISTS `#{schema}` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */;";
@@ -80,8 +88,8 @@ public class CreateDBServiceImpl implements CreateDBService {
             scriptRunner.setStopOnError(true);
 
             //fixme 测试能不能放在包下
-//            ClassPathResource classPathResource = new ClassPathResource("db_wimoorTemplate.sql");    //建库文件在根目录下
-            ClassPathResource classPathResource = new ClassPathResource("com/kyrie/doc/db_wimoorTemplate.sql");
+//            ClassPathResource classPathResource = new ClassPathResource("db_Template.sql");    //建库文件在根目录下
+            ClassPathResource classPathResource = new ClassPathResource("com/kyrie/doc/db_Template.sql");
             InputStream inputStream = classPathResource.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             scriptRunner.runScript(inputStreamReader);
@@ -90,9 +98,11 @@ public class CreateDBServiceImpl implements CreateDBService {
 
 
             //TODO 这里把数据源添 并且到请求头
-            String s = addDataSource(createDBDTO);
+            String s = createDBServiceProxy.addDataSource(createDbInfo);
             log.info(s);
 
+            //建库信息保存到主表
+            createDBMapper.insert(createDbInfo);
             return "建库成功";
 
         } catch (Exception e) {
@@ -115,7 +125,8 @@ public class CreateDBServiceImpl implements CreateDBService {
      * @param createDbDTO
      * @return
      */
-    public String addDataSource(CreateDbDTO createDbDTO) {
+    @Transactional
+    public String addDataSource(CreateDbInfo createDbDTO) {
         DruidDataSource tempDB = new DruidDataSource();
         tempDB.setUrl(createDbDTO.getUrl());
         tempDB.setUsername(createDbDTO.getUsername());
@@ -132,7 +143,7 @@ public class CreateDBServiceImpl implements CreateDBService {
         return "用户：" + createDbDTO.getUsername() + ", 数据源已添加：" + createDbDTO.getUrl();
     }
 
-    boolean tryConnectDB(CreateDbDTO createDBDTO) {
+    boolean tryConnectDB(CreateDbInfo createDBDTO) {
         Connection connection = null;
         try {
             //这里尝试连接的是数据库的mysql表，因为mysql表是自带的，肯定存在
@@ -154,7 +165,7 @@ public class CreateDBServiceImpl implements CreateDBService {
         }
     }
 
-    boolean checkDBName(CreateDbDTO createDbDTO) {
+    boolean checkDBName(CreateDbInfo createDbDTO) {
         //fixme 查询数据库是否重名
         //User user = DBService.selectByName(createDbDTO.getSchameName);
         //if(！Objects.isNull(user)){ retuen false;}

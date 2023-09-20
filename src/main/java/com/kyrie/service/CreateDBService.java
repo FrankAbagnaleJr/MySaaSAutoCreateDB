@@ -1,11 +1,10 @@
 package com.kyrie.service;
 
-import com.kyrie.pojo.CreateDbDTO;
-
-import java.io.IOException;
-import java.sql.SQLException;
+import com.kyrie.pojo.CreateDbInfo;
 
 public interface CreateDBService {
-    String initDB(CreateDbDTO createDBDTO);
+    String initDB(CreateDbInfo createDBDTO);
+
+    String addDataSource(CreateDbInfo createDbDTO);
 
 }

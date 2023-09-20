@@ -1,11 +1,10 @@
 package com.kyrie.controller;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.kyrie.pojo.User;
 import com.kyrie.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -14,10 +13,15 @@ import java.util.Objects;
 public class UserController {
 
     @Autowired
-    private UserService crudService;
+    private UserService userService;
 
-    @GetMapping("/c")
-    public String c(Long id) {
-        return crudService.queryUser(id);
+    @GetMapping("/find/#{id}")
+    public String f(Long id) {
+        return userService.queryUser(id);
+    }
+
+    @PostMapping("/add")
+    public String a(@RequestBody User user){
+        return userService.add(user);
     }
 }

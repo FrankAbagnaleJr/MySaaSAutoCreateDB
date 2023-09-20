@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kyrie.mapper.CreateDBMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.kyrie.pojo.CreateDbInfo">
+        <id column="id" property="id" />
+        <result column="db_schema_name" property="schemaName" />
+        <result column="db_ip" property="ip" />
+        <result column="db_port" property="port" />
+        <result column="db_url" property="url" />
+        <result column="db_username" property="username" />
+        <result column="db_password" property="password" />
+        <result column="db_driver_class" property="driverClass" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, db_schema_name, db_ip, db_port, db_url, db_username, db_password, db_driver_class
+    </sql>
+
+</mapper>

@@ -1,7 +1,6 @@
 package com.kyrie.controller;
 
-import com.baomidou.dynamic.datasource.annotation.DS;
-import com.kyrie.pojo.CreateDbDTO;
+import com.kyrie.pojo.CreateDbInfo;
 import com.kyrie.service.CreateDBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ public class CreateDBController {
      * @return
      */
     @PostMapping("/initDB")
-    public String initDB(@RequestBody CreateDbDTO createDBDTO) {
+    public String initDB(@RequestBody CreateDbInfo createDBDTO) {
         return createDBService.initDB(createDBDTO);
     }
 

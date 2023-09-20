@@ -1,6 +1,8 @@
 CREATE DATABASE IF NOT EXISTS `test_saas` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */;
 USE `test_saas`;
 
+
+-- 这张表在自己的库中，用来存用户的数据库连接信息
 CREATE TABLE IF NOT EXISTS `test_db_info` (
     `id` bigint(20) unsigned NOT NULL,
     `db_schema_name` char(100) DEFAULT NULL COMMENT ' ',
@@ -14,13 +16,13 @@ CREATE TABLE IF NOT EXISTS `test_db_info` (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB ;
 
-
+-- 这张表是用户数据库创建的，用来测试
 CREATE TABLE IF NOT EXISTS `test_user` (
     `id` bigint(20) unsigned NOT NULL,
     `name` char(100) DEFAULT NULL,
     `company` char(100) DEFAULT NULL,
     `addr` char(100) DEFAULT NULL,
-    `iphone` char(100) DEFAULT NULL,
+    `phone` char(100) DEFAULT NULL,
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB ;
 

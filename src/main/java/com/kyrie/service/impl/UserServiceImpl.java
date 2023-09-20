@@ -26,4 +26,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return "没找到用户";
     }
+
+    @Override
+    public String add(User user) {
+        int insert = userMapper.insert(user);
+        if (insert > 0) {
+            return "添加成功！";
+        }
+        return "添加失败！";
+    }
 }

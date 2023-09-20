@@ -44,7 +44,7 @@ public class AutoSqlFileTest {
             ScriptRunner scriptRunner = new ScriptRunner(connection);
             scriptRunner.setStopOnError(true);
 
-            ClassPathResource classPathResource = new ClassPathResource("db_wimoorTemplate.sql");
+            ClassPathResource classPathResource = new ClassPathResource("db_Template.sql");
             InputStream inputStream = classPathResource.getInputStream();
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             scriptRunner.runScript(inputStreamReader);

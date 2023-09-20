@@ -13,7 +13,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, phone, email, profession, age, gender, status, createtime
+        id, name, company, addr, phone
     </sql>
 
     <select id="selectByAge" resultType="com.kyrie.pojo.User" parameterType="integer">
