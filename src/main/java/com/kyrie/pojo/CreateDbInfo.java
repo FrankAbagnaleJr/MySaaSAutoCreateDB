@@ -29,4 +29,7 @@ public class CreateDbInfo {
 
     @TableField("db_driver_class")
     private String driverClass = "com.mysql.cj.jdbc.Driver";
+    @TableField("status")
+    private Integer status;
+
 }

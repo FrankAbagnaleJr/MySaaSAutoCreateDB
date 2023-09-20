@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `test_db_info` (
     `db_username` char(100) DEFAULT NULL COMMENT ' ',
     `db_password` char(100) DEFAULT NULL COMMENT ' ',
     `db_driver_class` char(100) DEFAULT NULL COMMENT ' ',
-    `state` bigint(10) DEFAULT '0',
+    `status` bigint(10) DEFAULT '0',
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB ;
 

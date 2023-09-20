@@ -3,9 +3,11 @@ package com.kyrie.service.impl;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kyrie.mapper.CreateDBMapper;
 import com.kyrie.pojo.CreateDbInfo;
 import com.kyrie.service.CreateDBService;
+import com.kyrie.utils.DruidDataSourceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ import java.util.Objects;
 @Slf4j
 @Service
 @DS("master")
-public class CreateDBServiceImpl implements CreateDBService {
+public class CreateDBServiceImpl extends ServiceImpl<CreateDBMapper,CreateDbInfo> implements CreateDBService {
 
     @Autowired
     CreateDBService createDBServiceProxy;
@@ -34,7 +36,7 @@ public class CreateDBServiceImpl implements CreateDBService {
     CreateDBMapper createDBMapper;
 
     @Resource
-    DynamicRoutingDataSource dataSource;
+    DynamicRoutingDataSource dynamicRoutingDataSource;
 
     @Autowired
     HttpServletResponse response;
@@ -97,12 +99,19 @@ public class CreateDBServiceImpl implements CreateDBService {
             //fixme 建库成功后向数据库表记录下来。id, 用户名字, 数据库名字 , 数据库账号密码, 数据库状态（0未创建，1已创建，2逻辑删除）
 
 
-            //TODO 这里把数据源添 并且到请求头
-            String s = createDBServiceProxy.addDataSource(createDbInfo);
+            //TODO 这里把数据源添加到缓存 并且到请求头
+            String s = createDBServiceProxy.addDataSourceToCache(createDbInfo);
             log.info(s);
 
+            //设置建库状态为1，就是已建库
+            createDbInfo.setStatus(1);
             //建库信息保存到主表
             createDBMapper.insert(createDbInfo);
+
+            //把数据源添加到response请求头中返回
+            response.setHeader("schemaName",createDbInfo.getSchemaName());
+            log.info("已把数据源名添加到response中");
+
             return "建库成功";
 
         } catch (Exception e) {
@@ -122,35 +131,35 @@ public class CreateDBServiceImpl implements CreateDBService {
 
     /**
      * 添加到数据源，并且返回数据源名到请求头
-     * @param createDbDTO
+     * @param createDbInfo
      * @return
      */
     @Transactional
-    public String addDataSource(CreateDbInfo createDbDTO) {
-        DruidDataSource tempDB = new DruidDataSource();
-        tempDB.setUrl(createDbDTO.getUrl());
-        tempDB.setUsername(createDbDTO.getUsername());
-        tempDB.setPassword(createDbDTO.getPassword());
-        tempDB.setDriverClassName(createDbDTO.getDriverClass());
+    public String addDataSourceToCache(CreateDbInfo createDbInfo) {
+        //从自定义的方法中获取一个设置了一些默认值的DruidDataSource对象
+        DruidDataSource tempDB = DruidDataSourceFactory.getInitDBConfig();
+//        DruidDataSource tempDB = new DruidDataSource();
+        tempDB.setUrl(createDbInfo.getUrl());
+        tempDB.setUsername(createDbInfo.getUsername());
+        tempDB.setPassword(createDbInfo.getPassword());
+        tempDB.setDriverClassName(createDbInfo.getDriverClass());
 
         //根据数据库名存入数据源，找数据源的时候根据数据库名找
-        dataSource.addDataSource(createDbDTO.getSchemaName(), tempDB);
+        dynamicRoutingDataSource.addDataSource(createDbInfo.getSchemaName(), tempDB);
 
-        //把数据源添加到response请求头中返回
-        response.setHeader("userDs",createDbDTO.getSchemaName());
-        log.info("已把数据源名添加到response中");
-
-        return "用户：" + createDbDTO.getUsername() + ", 数据源已添加：" + createDbDTO.getUrl();
+        return "用户：" + createDbInfo.getUsername() + ", 数据源已添加：" + createDbInfo.getUrl();
     }
 
     boolean tryConnectDB(CreateDbInfo createDBDTO) {
         Connection connection = null;
         try {
+            //通过Class.forName加载jdbc的驱动，去拿connection
+            Class.forName(createDBDTO.getDriverClass());
             //这里尝试连接的是数据库的mysql表，因为mysql表是自带的，肯定存在
             String dbUrl = "jdbc:mysql://" + createDBDTO.getIp() + ":" + createDBDTO.getPort() + "/mysql?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true";
             connection = DriverManager.getConnection(dbUrl, createDBDTO.getUsername(), createDBDTO.getPassword());
             return true;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             log.error("连接数据库失败", e.getMessage());
             return false;
         } finally {
