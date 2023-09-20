@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/create")
-@DS("master")
 public class CreateDBController {
 
     @Autowired

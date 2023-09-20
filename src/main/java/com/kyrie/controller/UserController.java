@@ -11,7 +11,6 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/test")
-@DS("#header.userDs")
 public class UserController {
 
     @Autowired

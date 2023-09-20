@@ -2,6 +2,7 @@ package com.kyrie.service.impl;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.kyrie.pojo.CreateDbDTO;
 import com.kyrie.service.CreateDBService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.Objects;
 
 @Slf4j
 @Service
+@DS("master")
 public class CreateDBServiceImpl implements CreateDBService {
 
     @Resource
@@ -125,7 +127,7 @@ public class CreateDBServiceImpl implements CreateDBService {
 
         //把数据源添加到response请求头中返回
         response.setHeader("userDs",createDbDTO.getSchemaName());
-        log.info("已把数据源名添加到resp中");
+        log.info("已把数据源名添加到response中");
 
         return "用户：" + createDbDTO.getUsername() + ", 数据源已添加：" + createDbDTO.getUrl();
     }
